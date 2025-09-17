@@ -1,0 +1,7 @@
+torch
+transformers
+Pillow
+faiss-cpu
+numpy
+matplotlib
+tqdm
