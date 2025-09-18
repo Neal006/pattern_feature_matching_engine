@@ -5,3 +5,8 @@ faiss-cpu
 numpy
 matplotlib
 tqdm
+ultralytics
+streamlit
+opencv-python
+scikit-learn
+scipy
