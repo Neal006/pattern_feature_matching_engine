@@ -23,6 +23,8 @@ import base64
 import cv2
 from sklearn.preprocessing import normalize
 from scipy.spatial.distance import cosine
+from datetime import datetime
+import hashlib
 
 # Set page config
 st.set_page_config(
@@ -418,11 +420,51 @@ def main():
     )
     
     if uploaded_file is not None:
+        # Save uploaded image to uploads101 folder with timestamped name
+        try:
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            uploads_dir = os.path.join(base_dir, "uploads101")
+            os.makedirs(uploads_dir, exist_ok=True)
+
+            # Read bytes once to avoid stream pointer issues
+            file_bytes = uploaded_file.getvalue()
+
+            # Initialize session store for saved file hashes
+            if "_saved_upload_hashes" not in st.session_state:
+                st.session_state["_saved_upload_hashes"] = set()
+
+            # Compute a stable hash of the uploaded content
+            file_hash = hashlib.sha256(file_bytes).hexdigest()
+
+            # Deterministic filename using content hash (prevents duplicates across sessions)
+            original_name = os.path.basename(uploaded_file.name)
+            _, ext = os.path.splitext(original_name)
+            saved_name = f"{file_hash}{ext.lower()}"
+            saved_path = os.path.join(uploads_dir, saved_name)
+
+            # Only save if this exact content hasn't been saved in this session
+            if file_hash not in st.session_state["_saved_upload_hashes"]:
+                if not os.path.exists(saved_path):
+                    with open(saved_path, "wb") as f:
+                        f.write(file_bytes)
+                    st.info(f"📁 Saved uploaded image to: {saved_path}")
+                else:
+                    st.caption("Duplicate detected — file already exists, not saving again.")
+                st.session_state["_saved_upload_hashes"].add(file_hash)
+            else:
+                st.caption("Duplicate upload detected in this session — not saving again.")
+
+            # Remember the last saved/located path for downstream steps if needed
+            st.session_state["_last_uploaded_image_path"] = saved_path
+        except Exception as e:
+            st.warning(f"Could not save uploaded image: {str(e)}")
+
         # Display uploaded image
         col1, col2 = st.columns([1, 2])
         
         with col1:
-            image = Image.open(uploaded_file).convert("RGB")
+            # Open from the in-memory bytes to avoid pointer issues
+            image = Image.open(BytesIO(file_bytes)).convert("RGB")
             st.image(image, caption="Uploaded Image", width='stretch')
         
         with col2:
