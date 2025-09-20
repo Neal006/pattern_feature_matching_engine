@@ -62,4 +62,4 @@ if __name__ == "__main__":
         axes[k].axis('off')
 
     plt.tight_layout()
-    plt.savefig('results101/result18.png')
+    plt.savefig('results/result18.png')
