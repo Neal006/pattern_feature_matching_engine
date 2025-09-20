@@ -37,7 +37,7 @@ if __name__ == "__main__":
     print('distances:', d)
     print('indexes:', i)
     catalogue_images = []
-    for root, dirs, files in os.walk('./catalogue101'):
+    for root, dirs, files in os.walk('./catalogue'):
         for file in files:
             if file.endswith('jpg'):
                 catalogue_images.append(root + '/' + file)

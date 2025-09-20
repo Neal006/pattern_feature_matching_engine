@@ -12,7 +12,7 @@ processor = AutoImageProcessor.from_pretrained('facebook/dinov2-small')
 model = AutoModel.from_pretrained('facebook/dinov2-small').to(device)
 
 images = []
-for root, dirs, files in os.walk('./catalogue101'):
+for root, dirs, files in os.walk('./catalogue'):
     for file in files:
         if file.lower().endswith(('.jpg', '.jpeg', '.png')):
             images.append(root  + '/'+ file)
